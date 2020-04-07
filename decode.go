@@ -2,10 +2,12 @@ package report
 
 import (
 	"archive/zip"
+	"bytes"
 	"compress/gzip"
 	"encoding/xml"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"path/filepath"
 )
 
@@ -54,29 +56,21 @@ func DecodeZip(r io.ReaderAt, size int64) (*Aggregate, error) {
 	return nil, fmt.Errorf("no suitable .xml file found in zip")
 }
 
-// DecodeErr decodes and check errors in a dmarc aggregate report
-func DecodeErr(r io.Reader) error {
-	agg, err := Decode(r)
-	if err != nil {
-		return err
+// DecodeFile decodes dmarc aggregate report based on its name
+func DecodeFile(filename string, r io.Reader) (*Aggregate, error) {
+	ext := filepath.Ext(filename)
+	if ext == ".gz" {
+		return DecodeGzip(r)
 	}
-	return agg.Err()
-}
-
-// DecodeGzipErr decodes and check errors in a gzipped dmarc aggregate report
-func DecodeGzipErr(r io.Reader) error {
-	agg, err := DecodeGzip(r)
-	if err != nil {
-		return err
+	if ext != ".zip" {
+		// not .gz and not .zip: try to decode it as .xml
+		return Decode(r)
 	}
-	return agg.Err()
-}
-
-// DecodeZipErr decodes and check errors in a zipped dmarc aggregate report
-func DecodeZipErr(r io.ReaderAt, size int64) error {
-	agg, err := DecodeZip(r, size)
+	// .zip must be fully read to decode
+	buf, err := ioutil.ReadAll(r)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return agg.Err()
+	br := bytes.NewReader(buf)
+	return DecodeZip(br, br.Size())
 }
