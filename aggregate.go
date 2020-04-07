@@ -1,3 +1,4 @@
+// Package report is a DMARC Report library written in Go to decode dmarc aggregate reports
 package report
 
 import (
