@@ -53,3 +53,30 @@ func DecodeZip(r io.ReaderAt, size int64) (*Aggregate, error) {
 
 	return nil, fmt.Errorf("no suitable .xml file found in zip")
 }
+
+// DecodeErr decodes and check errors in a dmarc aggregate report
+func DecodeErr(r io.Reader) error {
+	agg, err := Decode(r)
+	if err != nil {
+		return err
+	}
+	return agg.Err()
+}
+
+// DecodeGzipErr decodes and check errors in a gzipped dmarc aggregate report
+func DecodeGzipErr(r io.Reader) error {
+	agg, err := DecodeGzip(r)
+	if err != nil {
+		return err
+	}
+	return agg.Err()
+}
+
+// DecodeZipErr decodes and check errors in a zipped dmarc aggregate report
+func DecodeZipErr(r io.ReaderAt, size int64) error {
+	agg, err := DecodeZip(r, size)
+	if err != nil {
+		return err
+	}
+	return agg.Err()
+}

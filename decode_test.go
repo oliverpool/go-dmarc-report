@@ -99,7 +99,7 @@ func TestRecordErr(t *testing.T) {
 	a.NoError(err)
 	a.NoError(agg.Records[0].Err())
 	a.Error(agg.Records[1].Err())
-	a.Equal(`Failure for source IP 10.1.1.1:
+	a.Equal(`Failure for source IP 10.1.1.2:
 	* DKIM is not aligned
 	* SPF is not aligned
 	* DKIM authentication failed
@@ -110,10 +110,10 @@ func TestRecordErr(t *testing.T) {
 func TestAggregateErr(t *testing.T) {
 	a := assert.New(t)
 
-	f, err := os.Open("testdata/test_report.xml")
+	f, err := os.Open("testdata/test_report.xml.gz")
 	a.NoError(err)
 	defer f.Close()
-	agg, err := Decode(f)
+	agg, err := DecodeGzip(f)
 	a.NoError(err)
 	a.Error(agg.Err())
 	a.Equal(`Some record failed:
