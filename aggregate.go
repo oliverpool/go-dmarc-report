@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Aggregate represents root of dmarc report struct
+// Aggregate represents a dmarc aggregate report
 type Aggregate struct {
 	XMLName         xml.Name        `xml:"feedback"`
 	Metadata        Metadata        `xml:"report_metadata"`
